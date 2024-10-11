@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'rbold': ['RedHatDisplay-Bold', 'sans-serif'],
+        'rblack': ['RedHatDisplay-Black', 'sans-serif'],
       },
       boxShadow: {
         'glow-purple': '0 0 15px 5px #5e67ac',
