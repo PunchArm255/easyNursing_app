@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>easyNursing Home Page</title>
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com">
     <style>
+      @font-face {
+        font-family: 'RedHatDisplay';
+        src: url('./fonts/RedHatDisplay-Bold.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+      }
+
       body {
-        font-family: 'Red Hat Display', sans-serif;
+        font-family: 'RedHatDisplay', sans-serif;
       }
     </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f7f7f7] flex justify-start items-start h-[150vh] overflow-hidden">
     <!-- Sidebar -->

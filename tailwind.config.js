@@ -2,9 +2,14 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
+    "./index.html",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'rbold': ['RedHatDisplay-Bold', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }
