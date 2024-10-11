@@ -16,6 +16,28 @@
       body {
         font-family: 'RedHatDisplay', sans-serif;
       }
+
+      .scale-0 {
+        transform: scale(0);
+      }
+      .scale-100 {
+        transform: scale(1);
+      }
+      .modal-enter {
+        opacity: 0;
+      }
+      .modal-active {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+        transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+      }
+      .modal-content-active {
+        transition: transform 0.3s ease;
+      }
+      .modal-exit {
+        opacity: 0;
+        transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+      }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -35,13 +57,13 @@
 <div class="flex-1 ml-[100px] px-10 py-8">
 
     <!-- Journal Title -->
-    <h1 class="text-4xl font-bold text-indigo-800 mb-6">
+    <h1 class="text-5xl font-bold text-[#5e67ac] mb-6">
       Journal
     </h1>
 
     <!-- Buttons -->
     <div class="w-full flex justify-between mb-8">
-        <button id="addTaskBtn" class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-6">
+        <button id="addTaskBtn" class="bg-[#cbd1ff] text-[#5e67ac] rounded-full py-2 px-6">
           Ajouter une tache
         </button>
         <button class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-6"
@@ -51,38 +73,42 @@
     </div>
 
     <!-- Task Box -->
-    <div class="w-full h-[500px] bg-[#f1f3ff] rounded-lg p-4 overflow-y-auto" id="taskContainer">
+    <div class="w-full h-[600px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto" id="taskContainer"
+    style="box-shadow: 0 0 50px 0.1px #cbd1ff;">
       <!-- Dynamically added tasks will go here -->
     </div>
 </div>
 
 <!-- Modal (hidden by default) -->
-<div id="taskModal" class="fixed inset-0 bg-black bg-opacity-30 hidden justify-center items-center">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-    <h2 class="text-xl font-bold mb-4">Ajouter une tâche</h2>
-    <input type="text" id="taskName" class="w-full border border-gray-300 rounded-lg p-2 mb-4" placeholder="Nom de la tâche">
-    
+<div id="taskModal" class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active">
+  <div class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active">
+    <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">Ajouter une tâche</h2>
+    <input type="text" id="taskName" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4" placeholder="Nom de la tâche">
     <div class="mb-4">
-      <label class="mr-4">Type de tâche:</label>
-      <select id="taskType" class="border border-gray-300 rounded-lg p-2">
-        <option value="1">Type 1 (Red)</option>
-        <option value="2">Type 2 (Green)</option>
+      <label class="mr-4 text-[#5e67ac]">Type de tâche:</label>
+      <select id="taskType" class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400">
+        <option value="1" class="text-red-400">Examens Paracliniques</option>
+        <option value="2" class="text-green-300">Traitement Recu</option>
       </select>
     </div>
 
-    <div class="flex justify-end space-x-4">
-      <button id="cancelBtn" class="bg-gray-300 text-black rounded-full py-2 px-4">
-        Annuler
-      </button>
-      <button id="saveTaskBtn" class="bg-blue-500 text-white rounded-full py-2 px-4">
-        Enregistrer
-      </button>
-    </div>
+      <div class="flex space-x-2 justify-end">
+        <button id="saveTaskBtn" class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-4">
+          Enregistrer
+        </button>
+        <button id="deleteTaskBtn" class="bg-[#d55e5e] text-[#ffe1e1] rounded-full py-2 px-4 hidden">
+          Supprimer
+        </button>
+        <button id="cancelBtn" class="bg-[#f1f3ff] text-[#5e67ac] rounded-full py-2 px-4">
+          Annuler
+        </button>
+      </div>
   </div>
 </div>
 
 <script>
-  // Modal functionality
+  let editingTask = null; // Reference to the task being edited
+
   const addTaskBtn = document.getElementById('addTaskBtn');
   const taskModal = document.getElementById('taskModal');
   const cancelBtn = document.getElementById('cancelBtn');
@@ -90,34 +116,98 @@
   const taskNameInput = document.getElementById('taskName');
   const taskTypeInput = document.getElementById('taskType');
   const taskContainer = document.getElementById('taskContainer');
+  const modalContent = taskModal.querySelector('div');
+  const deleteTaskBtn = document.getElementById('deleteTaskBtn');
+  const modalTitle = document.getElementById('modalTitle');
 
   addTaskBtn.addEventListener('click', () => {
-    taskModal.classList.remove('hidden');
+    resetModal();
+    taskModal.classList.remove('hidden', 'modal-enter');
+    taskModal.classList.add('modal-active');
+    setTimeout(() => {
+      modalContent.classList.remove('scale-0');
+      modalContent.classList.add('scale-100');
+    }, 10);
   });
 
-  cancelBtn.addEventListener('click', () => {
-    taskModal.classList.add('hidden');
-  });
+  cancelBtn.addEventListener('click', closeModal);
 
   saveTaskBtn.addEventListener('click', () => {
     const taskName = taskNameInput.value.trim();
     const taskType = taskTypeInput.value;
 
     if (taskName !== "") {
-      const taskDiv = document.createElement('div');
-      taskDiv.classList.add('p-2', 'mb-2', 'rounded-lg');
-      taskDiv.style.backgroundColor = taskType === '1' ? '#fca5a5' : '#86efac';
-      taskDiv.innerText = taskName;
+      if (editingTask) {
+        // Update existing task
+        editingTask.innerText = ' + ' + taskName;
+        editingTask.style.backgroundColor = taskType === '1' ? '#ffd3d3' : '#d3ffda';
+        editingTask.classList.toggle('text-[#ac5e5e]', taskType === '1');
+        editingTask.classList.toggle('text-[#437d4f]', taskType === '2');
+      } else {
+        // Create a new task
+        const taskDiv = document.createElement('div');
+        taskDiv.classList.add('p-2', 'mb-2', 'rounded-2xl', taskType === '1' ? 'text-[#ac5e5e]' : 'text-[#437d4f]');
+        taskDiv.style.backgroundColor = taskType === '1' ? '#ffd3d3' : '#d3ffda';
+        taskDiv.innerText = ' + ' + taskName;
+        taskDiv.addEventListener('click', () => editTask(taskDiv));
+        taskContainer.appendChild(taskDiv);
+      }
 
-      taskContainer.appendChild(taskDiv);
+      closeModal();
+    }
+  });
+
+  deleteTaskBtn.addEventListener('click', () => {
+    if (editingTask) {
+      editingTask.remove(); // Remove the task from DOM
+      closeModal();
+    }
+  });
+
+  function closeModal() {
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-0');
+    taskModal.classList.remove('modal-active');
+    taskModal.classList.add('modal-exit');
+    setTimeout(() => {
       taskModal.classList.add('hidden');
+      taskModal.classList.remove('modal-exit');
+      resetModal(); // Reset modal state after closing
+    }, 300);
+  }
 
-      // Reset inputs
-      taskNameInput.value = '';
-      taskTypeInput.value = '1';
+  function editTask(taskDiv) {
+    // Set the modal for editing mode
+    editingTask = taskDiv;
+    taskNameInput.value = taskDiv.innerText.trim().slice(2); // Remove leading ' + ' from task name
+    taskTypeInput.value = taskDiv.classList.contains('text-[#ac5e5e]') ? '1' : '2';
+    taskModal.classList.remove('hidden', 'modal-enter');
+    taskModal.classList.add('modal-active');
+    deleteTaskBtn.classList.remove('hidden'); // Show the delete button for editing
+    modalTitle.innerText = 'Modifier une tâche';
+    setTimeout(() => {
+      modalContent.classList.remove('scale-0');
+      modalContent.classList.add('scale-100');
+    }, 10);
+  }
+
+  function resetModal() {
+    taskNameInput.value = '';
+    taskTypeInput.value = '1'; // Default task type
+    editingTask = null; // Reset the editing task
+    deleteTaskBtn.classList.add('hidden'); // Hide the delete button for new task
+    modalTitle.innerText = 'Ajouter une tâche';
+  }
+
+  taskTypeInput.addEventListener('change', () => {
+    if (taskTypeInput.value === '1') {
+      taskTypeInput.classList.remove('text-green-300');
+      taskTypeInput.classList.add('text-red-400');
+    } else if (taskTypeInput.value === '2') {
+      taskTypeInput.classList.remove('text-red-400');
+      taskTypeInput.classList.add('text-green-300');
     }
   });
 </script>
-
 </body>
 </html>
