@@ -4,36 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>easyNursing Home Page</title>
-    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: 'Red Hat Display', sans-serif;
+      }
+    </style>
 </head>
-<body>
-    <div class="sidebar">
-        <img src="assets/colorchange.png" alt="Add Icon" class="icon top-icon">
-        <div class="bottom-icons">
-            <img src="assets/user.svg" alt="User Icon" class="icon">
-            <img src="assets/settings.svg" alt="Settings Icon" class="icon">
+<body class="bg-[#f7f7f7] flex justify-start items-start h-[150vh] overflow-hidden">
+    <!-- Sidebar -->
+    <div class="bg-[#cbd1ff] w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]">
+        <img src="assets/colorchange.png" alt="Add Icon" class="w-[40px] mx-auto mb-auto">
+        <div class="flex flex-col gap-[30px] pb-[20px]">
+            <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto block filter invert-[26%] sepia-[21%] saturate-[3329%] hue-rotate-[202deg] brightness-[95%] contrast-[94%]">
+            <img src="assets/settings.svg" alt="Settings Icon" class="w-[40px] mx-auto block filter invert-[26%] sepia-[21%] saturate-[3329%] hue-rotate-[202deg] brightness-[95%] contrast-[94%]">
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h1>Welcome back, User!</h1>
-            <img src="assets/logo.png" alt="easyNursing Logo" class="logo">
+    <!-- Main Content -->
+    <div class="ml-[120px] p-[40px] w-[calc(100%-120px)]">
+        <div class="flex justify-between items-center">
+            <h1 class="text-[64px] text-[#5e67ac]">Welcome back, User!</h1>
+            <img src="assets/logo.png" alt="easyNursing Logo" class="w-[200px]">
         </div>
 
-        <div class="cards-container">
-            <div class="card">
-                <p>Progrès</p>
-                <img src="assets/performance.svg" alt="Performance Icon" class="card-icon">
+        <!-- Cards Container -->
+        <div class="flex justify-center gap-[40px] mt-[60px]">
+            <!-- First Card -->
+            <div class="bg-[#5e67ac] mt-11 rounded-[70px] w-[300px] h-[400px] flex flex-col justify-start items-center text-center pt-[30px] relative transition-transform transform hover:scale-[1.05] hover:shadow-lg active:scale-[0.98]">
+                <p class="text-white text-[43px] absolute top-[28px]">Progrès</p>
+                <img src="assets/performance.svg" alt="Performance Icon" class="w-[200px] h-[200px] filter invert mt-20">
             </div>
-            <div class="card big-card">
-                <p>Journal</p>
-                <img src="assets/journal.svg" alt="Journal Icon" class="card-icon">
+            
+            <!-- Second Card (Big Card) -->
+            <div class="bg-[#5e67ac] rounded-[70px] w-[360px] h-[500px] flex flex-col justify-start items-center text-center pt-[30px] relative transition-transform transform hover:scale-[1.05] hover:shadow-lg active:scale-[0.98]">
+                <p class="text-white text-[50px] absolute top-[30px]">Journal</p>
+                <img src="assets/journal.svg" alt="Journal Icon" class="w-[220px] h-[220px] filter invert mt-28">
             </div>
-            <div class="card">
-                <p>A Vérifier</p>
-                <img src="assets/verify.svg" alt="A Vérifier Icon" class="card-icon">
+            
+            <!-- Third Card -->
+            <div class="bg-[#5e67ac] mt-11 rounded-[70px] w-[300px] h-[400px] flex flex-col justify-start items-center text-center pt-[30px] relative transition-transform transform hover:scale-[1.05] hover:shadow-lg active:scale-[0.98]">
+                <p class="text-white text-[43px] absolute top-[28px]">A Vérifier</p>
+                <img src="assets/verify.svg" alt="A Vérifier Icon" class="w-[200px] h-[200px] filter invert mt-20">
             </div>
         </div>
     </div>
