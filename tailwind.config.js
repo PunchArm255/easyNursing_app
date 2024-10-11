@@ -9,6 +9,9 @@ module.exports = {
       fontFamily: {
         'rbold': ['RedHatDisplay-Bold', 'sans-serif'],
       },
+      boxShadow: {
+        'glow-purple': '0 0 15px 5px #5e67ac',
+      },
     },
   },
   plugins: [],
