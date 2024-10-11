@@ -11,7 +11,7 @@ body {
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
-    height: 100vh;
+    height: 150vh;
     overflow: hidden;
 }
 
@@ -20,8 +20,8 @@ body {
     background-color: #cbd1ff;
     width: 80px;
     height: 100vh;
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -35,6 +35,7 @@ body {
     width: 40px;
     margin: 0 auto;
     display: block;
+    filter: brightness(0) saturate(100%) invert(26%) sepia(21%) saturate(3329%) hue-rotate(202deg) brightness(95%) contrast(94%);
 }
 
 .top-icon {
@@ -46,6 +47,12 @@ body {
     flex-direction: column;
     gap: 30px;
     padding-bottom: 20px;
+}
+
+/* Logo styling */
+.logo {
+    width: 200px;
+    filter: brightness(0) saturate(100%) invert(26%) sepia(21%) saturate(3329%) hue-rotate(202deg) brightness(95%) contrast(94%);
 }
 
 /* Main content */
@@ -66,10 +73,6 @@ body {
     color: #5e67ac;
 }
 
-.logo {
-    width: 200px;
-}
-
 /* Cards container */
 .cards-container {
     display: flex;
@@ -80,30 +83,46 @@ body {
 
 .card {
     background-color: #5e67ac;
-    border-radius: 88px;
+    border-radius: 70px;
     width: 300px;
     height: 400px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
+    padding-top: 30px;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card:active {
+    transform: scale(0.98);
+    box-shadow: none;
 }
 
 .big-card {
-    width: 400px;
+    width: 360px;
     height: 500px;
 }
 
 .card p {
     color: white;
     font-size: 32px;
-    margin-top: 20px;
+    margin-bottom: 20px;
+    position: absolute;
+    top: 10px;
 }
 
 .card-icon {
     width: 100px;
     height: 100px;
+    filter: brightness(0) saturate(100%) invert(100%);
 }
 
 /* Responsive design */
