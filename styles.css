@@ -1,0 +1,125 @@
+/* Global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Red Hat Display', sans-serif;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #cbd1ff;
+    width: 80px;
+    height: 100vh;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 30px 0;
+}
+
+.icon {
+    width: 40px;
+    margin: 0 auto;
+    display: block;
+}
+
+.top-icon {
+    margin-bottom: auto;
+}
+
+.bottom-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding-bottom: 20px;
+}
+
+/* Main content */
+.main-content {
+    margin-left: 120px;
+    padding: 40px;
+    width: calc(100% - 120px);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 64px;
+    color: #5e67ac;
+}
+
+.logo {
+    width: 200px;
+}
+
+/* Cards container */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 60px;
+}
+
+.card {
+    background-color: #5e67ac;
+    border-radius: 88px;
+    width: 300px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.big-card {
+    width: 400px;
+    height: 500px;
+}
+
+.card p {
+    color: white;
+    font-size: 32px;
+    margin-top: 20px;
+}
+
+.card-icon {
+    width: 100px;
+    height: 100px;
+}
+
+/* Responsive design */
+@media screen and (max-width: 1920px) {
+    .header h1 {
+        font-size: 48px;
+    }
+    .cards-container {
+        gap: 30px;
+    }
+    .card {
+        width: 260px;
+        height: 360px;
+    }
+    .big-card {
+        width: 360px;
+        height: 460px;
+    }
+}
