@@ -1,4 +1,4 @@
-![screeen](https://github.com/user-attachments/assets/afa87b3b-7f64-42f5-8d9f-99764b2e1f26)
+![screeen](https://github.com/user-attachments/assets/ab868971-9921-4815-85d8-edb587f18382)
 # Welcome to EasyNursing 🏥
 
 **EasyNursing** is a web app designed to make task management and performance tracking for nurses simple and efficient. Whether you're logging tasks, monitoring your progress, or setting reminders for important actions, **EasyNursing** has got you covered! 🩺💼
