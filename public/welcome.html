@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'RedHatDisplay';
+            src: url('fonts/RedHatDisplay-Black.ttf') format('truetype');
+            font-weight: 900;
+        }
+        body {
+            font-family: 'RedHatDisplay', sans-serif;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes zoomOutFade {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+        @keyframes buttonFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .zoom-out-fade {
+            animation: zoomOutFade 0.5s ease-in-out forwards;
+        }
+        .no-scroll {
+            overflow: hidden;
+        }
+        .fade-in-button {
+            animation: buttonFadeIn 1s ease-in-out 1s forwards; /* 1s delay */
+            opacity: 0; /* Start hidden */
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center h-screen bg-gray-100">
+    <div class="text-center">
+        <img src="assets/logo.png" alt="Logo" class="w-[500px] mb-8">
+        <button class="bg-[#5e67ac] h-[50px] w-[180px] text-[#f1f3ff] py-2 px-4 text-lg rounded-full transition-transform transform hover:scale-110 hover:shadow-lg active:scale-95 fade-in-button" id="transitionButton">mr7ba bik hh</button>
+    </div>
+    <script>
+        document.getElementById('transitionButton').addEventListener('click', function() {
+            console.log('Setting sessionStorage flag');
+            sessionStorage.setItem('fromWelcome', 'true'); // Set the flag
+            document.body.classList.add('zoom-out-fade');
+            document.body.classList.add('no-scroll');
+            setTimeout(function() {
+                location.href = 'index.html';
+            }, 500); // Match the duration of the zoomOutFade animation
+        });
+    </script>
+</body>
+</html>
