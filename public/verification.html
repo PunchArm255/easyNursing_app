@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reminders</title>
+  <link rel="stylesheet" href="https://cdn.tailwindcss.com">
+  <style>
+    @font-face {
+    font-family: 'RedHatDisplay';
+    src: url('./fonts/RedHatDisplay-Black.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    }
+
+    body {
+    font-family: 'RedHatDisplay', sans-serif;
+    }
+
+    .scale-0 {
+    transform: scale(0);
+    }
+    .scale-100 {
+    transform: scale(1);
+    }
+    .modal-enter {
+    opacity: 0;
+    }
+    .modal-active {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    .modal-content-active {
+    transition: transform 0.3s ease;
+    }
+    .modal-exit {
+    opacity: 0;
+    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f7f7f7] flex justify-start items-start h-screen">
+
+<!-- Sidebar -->
+<div class="bg-[#5e67ac] w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]"
+   style="box-shadow: 0 0 40px 1px #5e67ac;">
+  <img src="assets/plus.svg" alt="Add Icon" class="w-[40px] mx-auto mb-auto">
+  <div class="flex flex-col gap-[30px] pb-[20px]">
+    <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto">
+    <img src="assets/settings.svg" alt="Settings Icon" class="w-[40px] mx-auto">
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="flex-1 ml-[100px] px-10 py-8">
+
+  <!-- Journal Title -->
+  <h1 class="text-5xl font-bold text-[#5e67ac] mb-4">
+    A Vérifier
+  </h1>
+
+  <!-- Buttons -->
+  <div class="w-full flex justify-between mb-8">
+    <button id="addReminderBtn" class="bg-[#cbd1ff] text-[#5e67ac] rounded-full py-2 px-6">
+      Ajouter une reminder
+    </button>
+    <button class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-5 mr-11"
+        onclick="window.location.href='index.html'">
+      Retour a l'accueil
+    </button>
+  </div>
+
+  <!-- Reminder and Countdown Boxes -->
+  <div class="flex space-x-4">
+    <!-- Reminder Box -->
+    <div class="w-[700px] h-[500px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto" id="reminderContainer"
+    style="box-shadow: 0 0 50px 0.1px #cbd1ff;">
+      <!-- Dynamically added tasks will go here -->
+    </div>
+
+    <!-- Countdown Box -->
+    <div class="w-[500px] h-[500px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto" id="countdownContainer"
+    style="box-shadow: 0 0 50px 0.1px #cbd1ff;">
+      <!-- Dynamically added countdowns will go here -->
+    </div>
+  </div>
+  
+</div>
+
+<!-- Modal (hidden by default) -->
+<div id="reminderModal" class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active">
+  <div class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active">
+  <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">Ajouter un reminder</h2>
+  <input type="text" id="reminderName" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4" placeholder="ghanfr3o ali hhhh">
+  <div class="mb-4">
+    <label class="mr-4 text-[#5e67ac] text-xl ml-1">Categorie:</label>
+    <select id="reminderType" class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400">
+    <option value="1" class="text-red-400">Examens Paracliniques</option>
+    <option value="2" class="text-green-300">Traitement Recu</option>
+    <option value="3" class="text-yellow-400">Soins Prodigue</option>
+    </select>
+  </div>
+
+    <div class="flex space-x-2 justify-end">
+    <button id="saveReminderBtn" class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-4">
+      Enregistrer
+    </button>
+    <button id="deleteReminderBtn" class="bg-[#d55e5e] text-[#ffe1e1] rounded-full py-2 px-4 hidden">
+      Supprimer
+    </button>
+    <button id="cancelReminderBtn" class="bg-[#f1f3ff] text-[#5e67ac] rounded-full py-2 px-4">
+      Annuler
+    </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let editingReminder = null; // Reference to the task being edited
+  let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+
+  const addReminderBtn = document.getElementById('addReminderBtn');
+  const reminderModal = document.getElementById('reminderModal');
+  const cancelReminderBtn = document.getElementById('cancelReminderBtn');
+  const saveReminderBtn = document.getElementById('saveReminderBtn');
+  const reminderNameInput = document.getElementById('reminderName');
+  const reminderTypeInput = document.getElementById('reminderType');
+  const reminderContainer = document.getElementById('reminderContainer');
+  const modalContent = reminderModal.querySelector('div');
+  const deleteReminderBtn = document.getElementById('deleteReminderBtn');
+  const modalTitle = document.getElementById('modalTitle');
+
+  addReminderBtn.addEventListener('click', () => {
+  resetModal();
+  reminderModal.classList.remove('hidden', 'modal-enter');
+  reminderModal.classList.add('modal-active');
+  setTimeout(() => {
+    modalContent.classList.remove('scale-0');
+    modalContent.classList.add('scale-100');
+  }, 10);
+  });
+
+  cancelReminderBtn.addEventListener('click', closeModal);
+
+  saveReminderBtn.addEventListener('click', () => {
+  const reminderName = reminderNameInput.value.trim();
+  const reminderType = reminderTypeInput.value;
+  const reminderDate = new Date().toLocaleString();
+
+  if (reminderName !== "") {
+    if (editingReminder) {
+    // Update existing task
+    editingReminder.querySelector('.task-name').innerText = ' • ' + reminderName;
+    editingReminder.querySelector('.task-date').innerText = reminderDate;
+    editingReminder.style.backgroundColor = getReminderColor(reminderType);
+    updateReminderClasses(editingReminder, reminderType);
+    updateReminderInLocalStorage(editingReminder.dataset.id, reminderName, reminderType, reminderDate);
+    } else {
+    // Create a new task
+    const reminderDiv = document.createElement('div');
+    const reminderId = Date.now().toString();
+    reminderDiv.classList.add('p-2', 'mb-2', 'rounded-3xl', 'h-[45px]', 'text-xl', 'px-4', 'flex', 'justify-between');
+    updateReminderClasses(reminderDiv, reminderType);
+    reminderDiv.style.backgroundColor = getReminderColor(reminderType);
+    reminderDiv.innerHTML = `<span class="task-name"> • ${reminderName}</span><span class="task-date">${reminderDate}</span>`;
+    reminderDiv.dataset.id = reminderId;
+    reminderDiv.addEventListener('click', () => editReminder(reminderDiv));
+    reminderContainer.appendChild(reminderDiv);
+    saveReminderToLocalStorage(reminderId, reminderName, reminderType, reminderDate);
+    }
+
+    closeModal();
+  }
+  });
+
+  deleteReminderBtn.addEventListener('click', () => {
+  if (editingReminder) {
+    removeReminderFromLocalStorage(editingReminder.dataset.id);
+    editingReminder.remove(); // Remove the task from DOM
+    closeModal();
+  }
+  });
+
+  function closeModal() {
+  modalContent.classList.remove('scale-100');
+  modalContent.classList.add('scale-0');
+  reminderModal.classList.remove('modal-active');
+  reminderModal.classList.add('modal-exit');
+  setTimeout(() => {
+    reminderModal.classList.add('hidden');
+    reminderModal.classList.remove('modal-exit');
+    resetModal(); // Reset modal state after closing
+  }, 300);
+  }
+
+  function editReminder(reminderDiv) {
+  // Set the modal for editing mode
+  editingReminder = reminderDiv;
+  reminderNameInput.value = reminderDiv.querySelector('.task-name').innerText.trim().slice(2); // Remove leading ' + ' from task name
+  reminderTypeInput.value = getReminderType(reminderDiv);
+  reminderModal.classList.remove('hidden', 'modal-enter');
+  reminderModal.classList.add('modal-active');
+  deleteReminderBtn.classList.remove('hidden'); // Show the delete button for editing
+  modalTitle.innerText = 'Modifier le reminder';
+  setTimeout(() => {
+    modalContent.classList.remove('scale-0');
+    modalContent.classList.add('scale-100');
+  }, 10);
+  }
+
+  function resetModal() {
+  reminderNameInput.value = '';
+  reminderTypeInput.value = '1'; // Default task type
+  editingReminder = null; // Reset the editing task
+  deleteReminderBtn.classList.add('hidden'); // Hide the delete button for new task
+  modalTitle.innerText = 'Ajouter un reminder';
+  }
+
+  reminderTypeInput.addEventListener('change', () => {
+  updateReminderTypeClass(reminderTypeInput);
+  });
+
+  function saveReminderToLocalStorage(id, name, type, date) {
+  reminders.push({ id, name, type, date });
+  localStorage.setItem('reminders', JSON.stringify(reminders));
+  }
+
+  function updateReminderInLocalStorage(id, name, type, date) {
+  reminders = reminders.map(reminder => reminder.id === id ? { id, name, type, date } : reminder);
+  localStorage.setItem('reminders', JSON.stringify(reminders));
+  }
+
+  function removeReminderFromLocalStorage(id) {
+  reminders = reminders.filter(reminder => reminder.id !== id);
+  localStorage.setItem('reminders', JSON.stringify(reminders));
+  }
+
+  function loadRemindersFromLocalStorage() {
+  reminders.forEach(reminder => {
+    const reminderDiv = document.createElement('div');
+    reminderDiv.classList.add('p-2', 'mb-2', 'rounded-3xl', 'h-[45px]', 'text-xl', 'px-4', 'flex', 'justify-between');
+    updateReminderClasses(reminderDiv, reminder.type);
+    reminderDiv.style.backgroundColor = getReminderColor(reminder.type);
+    reminderDiv.innerHTML = `<span class="task-name"> • ${reminder.name}</span><span class="task-date">${reminder.date}</span>`;
+    reminderDiv.dataset.id = reminder.id;
+    reminderDiv.addEventListener('click', () => editReminder(reminderDiv));
+    reminderContainer.appendChild(reminderDiv);
+  });
+  }
+
+  function getReminderColor(type) {
+  switch (type) {
+    case '1':
+    return '#ffd3d3';
+    case '2':
+    return '#d3ffda';
+    case '3':
+    return '#fff3b3';
+    default:
+    return '#f1f3ff';
+  }
+  }
+
+  function getReminderType(reminderDiv) {
+  if (reminderDiv.classList.contains('text-[#ac5e5e]')) return '1';
+  if (reminderDiv.classList.contains('text-[#437d4f]')) return '2';
+  if (reminderDiv.classList.contains('text-[#b3a437]')) return '3';
+  return '1';
+  }
+
+  function updateReminderClasses(reminderDiv, type) {
+  reminderDiv.classList.remove('text-[#ac5e5e]', 'text-[#437d4f]', 'text-[#b3a437]');
+  switch (type) {
+    case '1':
+    reminderDiv.classList.add('text-[#ac5e5e]');
+    break;
+    case '2':
+    reminderDiv.classList.add('text-[#437d4f]');
+    break;
+    case '3':
+    reminderDiv.classList.add('text-[#b3a437]');
+    break;
+  }
+  }
+
+  function updateReminderTypeClass(reminderTypeInput) {
+  reminderTypeInput.classList.remove('text-red-400', 'text-green-300', 'text-yellow-400');
+  switch (reminderTypeInput.value) {
+    case '1':
+    reminderTypeInput.classList.add('text-red-400');
+    break;
+    case '2':
+    reminderTypeInput.classList.add('text-green-300');
+    break;
+    case '3':
+    reminderTypeInput.classList.add('text-yellow-400');
+    break;
+  }
+  }
+
+  // Load reminders on page load
+  document.addEventListener('DOMContentLoaded', loadRemindersFromLocalStorage);
+</script>
+</body>
+</html>
