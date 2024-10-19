@@ -83,13 +83,13 @@
 <div id="taskModal" class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active">
   <div class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active">
   <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">Ajouter une note</h2>
-  <input type="text" id="taskName" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4" placeholder="ghanfr3o ali hhhh">
+  <input type="text" id="taskName" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4" placeholder="Nom du note">
   <div class="mb-4">
     <label class="mr-4 text-[#5e67ac] text-xl ml-1">Categorie:</label>
     <select id="taskType" class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400">
     <option value="1" class="text-red-400">Examens Paracliniques</option>
     <option value="2" class="text-green-300">Traitement Recu</option>
-    <option value="3" class="text-yellow-400">Soins Prodigue</option>
+    <option value="3" class="text-yellow-300">Soins Prodigue</option>
     </select>
   </div>
 
@@ -270,7 +270,7 @@
     taskDiv.classList.add('text-[#437d4f]');
     break;
     case '3':
-    taskDiv.classList.add('text-[#b3a437]');
+    taskDiv.classList.add('text-[#8c8325]'); // the old one was #b3a437 lol
     break;
   }
   }
