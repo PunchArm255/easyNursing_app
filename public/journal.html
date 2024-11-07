@@ -1,297 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Journal</title>
-  <link rel="stylesheet" href="https://cdn.tailwindcss.com">
-  <style>
-    @font-face {
-    font-family: 'RedHatDisplay';
-    src: url('./fonts/RedHatDisplay-Black.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Journal</title>
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com" />
+    <style>
+      @font-face {
+        font-family: "RedHatDisplay";
+        src: url("./fonts/RedHatDisplay-Black.ttf") format("truetype");
+        font-weight: bold;
+        font-style: normal;
+      }
 
-    body {
-    font-family: 'RedHatDisplay', sans-serif;
-    }
+      body {
+        font-family: "RedHatDisplay", sans-serif;
+      }
 
-    .scale-0 {
-    transform: scale(0);
-    }
-    .scale-100 {
-    transform: scale(1);
-    }
-    .modal-enter {
-    opacity: 0;
-    }
-    .modal-active {
-    opacity: 1;
-    backdrop-filter: blur(8px);
-    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
-    }
-    .modal-content-active {
-    transition: transform 0.3s ease;
-    }
-    .modal-exit {
-    opacity: 0;
-    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
-    }
-  </style>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-[#f7f7f7] flex justify-start items-start h-screen">
-
-<!-- Sidebar -->
-<div class="bg-[#5e67ac] w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]"
-   style="box-shadow: 0 0 40px 1px #5e67ac;">
-  <img src="assets/plus.svg" alt="Add Icon" class="w-[40px] mx-auto mb-auto">
-  <div class="flex flex-col gap-[30px] pb-[20px]">
-    <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto">
-    <img src="assets/settings.svg" alt="Settings Icon" class="w-[40px] mx-auto">
-  </div>
-</div>
-
-<!-- Main Content -->
-<div class="flex-1 ml-[100px] px-10 py-8">
-
-  <!-- Journal Title -->
-  <h1 class="text-5xl font-bold text-[#5e67ac] mb-4">
-    Journal
-  </h1>
-
-  <!-- Buttons -->
-  <div class="w-full flex justify-between mb-8">
-    <button id="addTaskBtn" class="bg-[#cbd1ff] text-[#5e67ac] rounded-full py-2 px-6">
-      Ajouter une note
-    </button>
-    <button class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-6"
-        onclick="window.location.href='index.html'">
-      Retour a l'accueil
-    </button>
-  </div>
-
-  <!-- Task Box -->
-  <div class="w-full h-[600px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto" id="taskContainer"
-  style="box-shadow: 0 0 50px 0.1px #cbd1ff;">
-    <!-- Dynamically added tasks will go here -->
-  </div>
-</div>
-
-<!-- Modal (hidden by default) -->
-<div id="taskModal" class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active">
-  <div class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active">
-  <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">Ajouter une note</h2>
-  <input type="text" id="taskName" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4" placeholder="Nom du note">
-  <div class="mb-4">
-    <label class="mr-4 text-[#5e67ac] text-xl ml-1">Categorie:</label>
-    <select id="taskType" class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400">
-    <option value="1" class="text-red-400">Examens Paracliniques</option>
-    <option value="2" class="text-green-300">Traitement Recu</option>
-    <option value="3" class="text-yellow-300">Soins Prodigue</option>
-    </select>
-  </div>
-
-    <div class="flex space-x-2 justify-end">
-    <button id="saveTaskBtn" class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-4">
-      Enregistrer
-    </button>
-    <button id="deleteTaskBtn" class="bg-[#d55e5e] text-[#ffe1e1] rounded-full py-2 px-4 hidden">
-      Supprimer
-    </button>
-    <button id="cancelBtn" class="bg-[#f1f3ff] text-[#5e67ac] rounded-full py-2 px-4">
-      Annuler
-    </button>
+      .scale-0 {
+        transform: scale(0);
+      }
+      .scale-100 {
+        transform: scale(1);
+      }
+      .modal-enter {
+        opacity: 0;
+      }
+      .modal-active {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+        transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+      }
+      .modal-content-active {
+        transition: transform 0.3s ease;
+      }
+      .modal-exit {
+        opacity: 0;
+        transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-[#f7f7f7] flex justify-start items-start h-screen">
+    <!-- Sidebar -->
+    <div
+      class="bg-[#5e67ac] w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]"
+      style="box-shadow: 0 0 40px 1px #5e67ac"
+    >
+      <img
+        src="assets/plus.svg"
+        alt="Add Icon"
+        class="w-[40px] mx-auto mb-auto"
+      />
+      <div class="flex flex-col gap-[30px] pb-[20px]">
+        <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto" />
+        <img
+          src="assets/settings.svg"
+          alt="Settings Icon"
+          class="w-[40px] mx-auto"
+        />
+      </div>
     </div>
-  </div>
-</div>
 
-<script>
-  let editingTask = null; // Reference to the task being edited
-  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    <!-- Main Content -->
+    <div class="flex-1 ml-[100px] px-10 py-8">
+      <!-- Journal Title -->
+      <h1 class="text-5xl font-bold text-[#5e67ac] mb-4">Journal</h1>
 
-  const addTaskBtn = document.getElementById('addTaskBtn');
-  const taskModal = document.getElementById('taskModal');
-  const cancelBtn = document.getElementById('cancelBtn');
-  const saveTaskBtn = document.getElementById('saveTaskBtn');
-  const taskNameInput = document.getElementById('taskName');
-  const taskTypeInput = document.getElementById('taskType');
-  const taskContainer = document.getElementById('taskContainer');
-  const modalContent = taskModal.querySelector('div');
-  const deleteTaskBtn = document.getElementById('deleteTaskBtn');
-  const modalTitle = document.getElementById('modalTitle');
+      <!-- Buttons -->
+      <div class="w-full flex justify-between mb-8">
+        <button
+          id="addTaskBtn"
+          class="bg-[#cbd1ff] text-[#5e67ac] rounded-full py-2 px-6"
+        >
+          Ajouter une note
+        </button>
+        <button
+          class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-6"
+          onclick="window.location.href='index.html'"
+        >
+          Retour a l'accueil
+        </button>
+      </div>
 
-  addTaskBtn.addEventListener('click', () => {
-  resetModal();
-  taskModal.classList.remove('hidden', 'modal-enter');
-  taskModal.classList.add('modal-active');
-  setTimeout(() => {
-    modalContent.classList.remove('scale-0');
-    modalContent.classList.add('scale-100');
-  }, 10);
-  });
+      <!-- Task Box -->
+      <div
+        class="w-full h-[600px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto"
+        id="taskContainer"
+        style="box-shadow: 0 0 50px 0.1px #cbd1ff"
+      >
+        <!-- Dynamically added tasks will go here -->
+      </div>
+    </div>
 
-  cancelBtn.addEventListener('click', closeModal);
+    <!-- Modal (hidden by default) -->
+    <div
+      id="taskModal"
+      class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active"
+    >
+      <div
+        class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active"
+      >
+        <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">
+          Ajouter une note
+        </h2>
+        <input
+          type="text"
+          id="taskName"
+          class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4"
+          placeholder="Nom du note"
+        />
+        <div class="mb-4">
+          <label class="mr-4 text-[#5e67ac] text-xl ml-1">Categorie:</label>
+          <select
+            id="taskType"
+            class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400"
+          >
+            <option value="1" class="text-red-400">
+              Examens Paracliniques
+            </option>
+            <option value="2" class="text-green-300">Traitement Recu</option>
+            <option value="3" class="text-yellow-300">Soins Prodigue</option>
+          </select>
+        </div>
 
-  saveTaskBtn.addEventListener('click', () => {
-  const taskName = taskNameInput.value.trim();
-  const taskType = taskTypeInput.value;
-  const taskDate = new Date().toLocaleString();
+        <div class="flex space-x-2 justify-end">
+          <button
+            id="saveTaskBtn"
+            class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-4"
+          >
+            Enregistrer
+          </button>
+          <button
+            id="deleteTaskBtn"
+            class="bg-[#d55e5e] text-[#ffe1e1] rounded-full py-2 px-4 hidden"
+          >
+            Supprimer
+          </button>
+          <button
+            id="cancelBtn"
+            class="bg-[#f1f3ff] text-[#5e67ac] rounded-full py-2 px-4"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
 
-  if (taskName !== "") {
-    if (editingTask) {
-    // Update existing task
-    editingTask.querySelector('.task-name').innerText = ' • ' + taskName;
-    editingTask.querySelector('.task-date').innerText = taskDate;
-    editingTask.style.backgroundColor = getTaskColor(taskType);
-    updateTaskClasses(editingTask, taskType);
-    updateTaskInLocalStorage(editingTask.dataset.id, taskName, taskType, taskDate);
-    } else {
-    // Create a new task
-    const taskDiv = document.createElement('div');
-    const taskId = Date.now().toString();
-    taskDiv.classList.add('p-2', 'mb-2', 'rounded-3xl', 'h-[45px]', 'text-xl', 'px-4', 'flex', 'justify-between');
-    updateTaskClasses(taskDiv, taskType);
-    taskDiv.style.backgroundColor = getTaskColor(taskType);
-    taskDiv.innerHTML = `<span class="task-name"> • ${taskName}</span><span class="task-date">${taskDate}</span>`;
-    taskDiv.dataset.id = taskId;
-    taskDiv.addEventListener('click', () => editTask(taskDiv));
-    taskContainer.appendChild(taskDiv);
-    saveTaskToLocalStorage(taskId, taskName, taskType, taskDate);
-    }
+    <script>
+      let editingTask = null; // Reference to the task being edited
+      let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    closeModal();
-  }
-  });
+      const addTaskBtn = document.getElementById("addTaskBtn");
+      const taskModal = document.getElementById("taskModal");
+      const cancelBtn = document.getElementById("cancelBtn");
+      const saveTaskBtn = document.getElementById("saveTaskBtn");
+      const taskNameInput = document.getElementById("taskName");
+      const taskTypeInput = document.getElementById("taskType");
+      const taskContainer = document.getElementById("taskContainer");
+      const modalContent = taskModal.querySelector("div");
+      const deleteTaskBtn = document.getElementById("deleteTaskBtn");
+      const modalTitle = document.getElementById("modalTitle");
 
-  deleteTaskBtn.addEventListener('click', () => {
-  if (editingTask) {
-    removeTaskFromLocalStorage(editingTask.dataset.id);
-    editingTask.remove(); // Remove the task from DOM
-    closeModal();
-  }
-  });
+      addTaskBtn.addEventListener("click", () => {
+        resetModal();
+        taskModal.classList.remove("hidden", "modal-enter");
+        taskModal.classList.add("modal-active");
+        setTimeout(() => {
+          modalContent.classList.remove("scale-0");
+          modalContent.classList.add("scale-100");
+        }, 10);
+      });
 
-  function closeModal() {
-  modalContent.classList.remove('scale-100');
-  modalContent.classList.add('scale-0');
-  taskModal.classList.remove('modal-active');
-  taskModal.classList.add('modal-exit');
-  setTimeout(() => {
-    taskModal.classList.add('hidden');
-    taskModal.classList.remove('modal-exit');
-    resetModal(); // Reset modal state after closing
-  }, 300);
-  }
+      cancelBtn.addEventListener("click", closeModal);
 
-  function editTask(taskDiv) {
-  // Set the modal for editing mode
-  editingTask = taskDiv;
-  taskNameInput.value = taskDiv.querySelector('.task-name').innerText.trim().slice(2); // Remove leading ' + ' from task name
-  taskTypeInput.value = getTaskType(taskDiv);
-  taskModal.classList.remove('hidden', 'modal-enter');
-  taskModal.classList.add('modal-active');
-  deleteTaskBtn.classList.remove('hidden'); // Show the delete button for editing
-  modalTitle.innerText = 'Modifier la note';
-  setTimeout(() => {
-    modalContent.classList.remove('scale-0');
-    modalContent.classList.add('scale-100');
-  }, 10);
-  }
+      saveTaskBtn.addEventListener("click", () => {
+        const taskName = taskNameInput.value.trim();
+        const taskType = taskTypeInput.value;
+        const taskDate = new Date().toLocaleString();
 
-  function resetModal() {
-  taskNameInput.value = '';
-  taskTypeInput.value = '1'; // Default task type
-  editingTask = null; // Reset the editing task
-  deleteTaskBtn.classList.add('hidden'); // Hide the delete button for new task
-  modalTitle.innerText = 'Ajouter une note';
-  }
+        if (taskName !== "") {
+          if (editingTask) {
+            // Update existing task
+            editingTask.querySelector(".task-name").innerText =
+              " • " + taskName;
+            editingTask.querySelector(".task-date").innerText = taskDate;
+            editingTask.style.backgroundColor = getTaskColor(taskType);
+            updateTaskClasses(editingTask, taskType);
+            updateTaskInLocalStorage(
+              editingTask.dataset.id,
+              taskName,
+              taskType,
+              taskDate
+            );
+          } else {
+            // Create a new task
+            const taskDiv = document.createElement("div");
+            const taskId = Date.now().toString();
+            taskDiv.classList.add(
+              "p-2",
+              "mb-2",
+              "rounded-3xl",
+              "h-[45px]",
+              "text-xl",
+              "px-4",
+              "flex",
+              "justify-between"
+            );
+            updateTaskClasses(taskDiv, taskType);
+            taskDiv.style.backgroundColor = getTaskColor(taskType);
+            taskDiv.innerHTML = `<span class="task-name"> • ${taskName}</span><span class="task-date">${taskDate}</span>`;
+            taskDiv.dataset.id = taskId;
+            taskDiv.addEventListener("click", () => editTask(taskDiv));
+            taskContainer.appendChild(taskDiv);
+            saveTaskToLocalStorage(taskId, taskName, taskType, taskDate);
+          }
 
-  taskTypeInput.addEventListener('change', () => {
-  updateTaskTypeClass(taskTypeInput);
-  });
+          closeModal();
+        }
+      });
 
-  function saveTaskToLocalStorage(id, name, type, date) {
-  tasks.push({ id, name, type, date });
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
+      deleteTaskBtn.addEventListener("click", () => {
+        if (editingTask) {
+          removeTaskFromLocalStorage(editingTask.dataset.id);
+          editingTask.remove(); // Remove the task from DOM
+          closeModal();
+        }
+      });
 
-  function updateTaskInLocalStorage(id, name, type, date) {
-  tasks = tasks.map(task => task.id === id ? { id, name, type, date } : task);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
+      function closeModal() {
+        modalContent.classList.remove("scale-100");
+        modalContent.classList.add("scale-0");
+        taskModal.classList.remove("modal-active");
+        taskModal.classList.add("modal-exit");
+        setTimeout(() => {
+          taskModal.classList.add("hidden");
+          taskModal.classList.remove("modal-exit");
+          resetModal(); // Reset modal state after closing
+        }, 300);
+      }
 
-  function removeTaskFromLocalStorage(id) {
-  tasks = tasks.filter(task => task.id !== id);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
+      function editTask(taskDiv) {
+        // Set the modal for editing mode
+        editingTask = taskDiv;
+        taskNameInput.value = taskDiv
+          .querySelector(".task-name")
+          .innerText.trim()
+          .slice(2); // Remove leading ' + ' from task name
+        taskTypeInput.value = getTaskType(taskDiv);
+        taskModal.classList.remove("hidden", "modal-enter");
+        taskModal.classList.add("modal-active");
+        deleteTaskBtn.classList.remove("hidden"); // Show the delete button for editing
+        modalTitle.innerText = "Modifier la note";
+        setTimeout(() => {
+          modalContent.classList.remove("scale-0");
+          modalContent.classList.add("scale-100");
+        }, 10);
+      }
 
-  function loadTasksFromLocalStorage() {
-  tasks.forEach(task => {
-    const taskDiv = document.createElement('div');
-    taskDiv.classList.add('p-2', 'mb-2', 'rounded-3xl', 'h-[45px]', 'text-xl', 'px-4', 'flex', 'justify-between');
-    updateTaskClasses(taskDiv, task.type);
-    taskDiv.style.backgroundColor = getTaskColor(task.type);
-    taskDiv.innerHTML = `<span class="task-name"> • ${task.name}</span><span class="task-date">${task.date}</span>`;
-    taskDiv.dataset.id = task.id;
-    taskDiv.addEventListener('click', () => editTask(taskDiv));
-    taskContainer.appendChild(taskDiv);
-  });
-  }
+      function resetModal() {
+        taskNameInput.value = "";
+        taskTypeInput.value = "1"; // Default task type
+        editingTask = null; // Reset the editing task
+        deleteTaskBtn.classList.add("hidden"); // Hide the delete button for new task
+        modalTitle.innerText = "Ajouter une note";
+      }
 
-  function getTaskColor(type) {
-  switch (type) {
-    case '1':
-    return '#ffd3d3';
-    case '2':
-    return '#d3ffda';
-    case '3':
-    return '#fff3b3';
-    default:
-    return '#f1f3ff';
-  }
-  }
+      taskTypeInput.addEventListener("change", () => {
+        updateTaskTypeClass(taskTypeInput);
+      });
 
-  function getTaskType(taskDiv) {
-  if (taskDiv.classList.contains('text-[#ac5e5e]')) return '1';
-  if (taskDiv.classList.contains('text-[#437d4f]')) return '2';
-  if (taskDiv.classList.contains('text-[#b3a437]')) return '3';
-  return '1';
-  }
+      function saveTaskToLocalStorage(id, name, type, date) {
+        tasks.push({ id, name, type, date });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
 
-  function updateTaskClasses(taskDiv, type) {
-  taskDiv.classList.remove('text-[#ac5e5e]', 'text-[#437d4f]', 'text-[#b3a437]');
-  switch (type) {
-    case '1':
-    taskDiv.classList.add('text-[#ac5e5e]');
-    break;
-    case '2':
-    taskDiv.classList.add('text-[#437d4f]');
-    break;
-    case '3':
-    taskDiv.classList.add('text-[#8c8325]'); // the old one was #b3a437 lol
-    break;
-  }
-  }
+      function updateTaskInLocalStorage(id, name, type, date) {
+        tasks = tasks.map((task) =>
+          task.id === id ? { id, name, type, date } : task
+        );
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
 
-  function updateTaskTypeClass(taskTypeInput) {
-  taskTypeInput.classList.remove('text-red-400', 'text-green-300', 'text-yellow-400');
-  switch (taskTypeInput.value) {
-    case '1':
-    taskTypeInput.classList.add('text-red-400');
-    break;
-    case '2':
-    taskTypeInput.classList.add('text-green-300');
-    break;
-    case '3':
-    taskTypeInput.classList.add('text-yellow-400');
-    break;
-  }
-  }
+      function removeTaskFromLocalStorage(id) {
+        tasks = tasks.filter((task) => task.id !== id);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
 
-  // Load tasks on page load
-  document.addEventListener('DOMContentLoaded', loadTasksFromLocalStorage);
-</script>
-</body>
+      function loadTasksFromLocalStorage() {
+        tasks.forEach((task) => {
+          const taskDiv = document.createElement("div");
+          taskDiv.classList.add(
+            "p-2",
+            "mb-2",
+            "rounded-3xl",
+            "h-[45px]",
+            "text-xl",
+            "px-4",
+            "flex",
+            "justify-between"
+          );
+          updateTaskClasses(taskDiv, task.type);
+          taskDiv.style.backgroundColor = getTaskColor(task.type);
+          taskDiv.innerHTML = `<span class="task-name"> • ${task.name}</span><span class="task-date">${task.date}</span>`;
+          taskDiv.dataset.id = task.id;
+          taskDiv.addEventListener("click", () => editTask(taskDiv));
+          taskContainer.appendChild(taskDiv);
+        });
+      }
+
+      function getTaskColor(type) {
+        switch (type) {
+          case "1":
+            return "#ffd3d3";
+          case "2":
+            return "#d3ffda";
+          case "3":
+            return "#fff3b3";
+          default:
+            return "#f1f3ff";
+        }
+      }
+
+      function getTaskType(taskDiv) {
+        if (taskDiv.classList.contains("text-[#ac5e5e]")) return "1";
+        if (taskDiv.classList.contains("text-[#437d4f]")) return "2";
+        if (taskDiv.classList.contains("text-[#b3a437]")) return "3";
+        return "1";
+      }
+
+      function updateTaskClasses(taskDiv, type) {
+        taskDiv.classList.remove(
+          "text-[#ac5e5e]",
+          "text-[#437d4f]",
+          "text-[#b3a437]"
+        );
+        switch (type) {
+          case "1":
+            taskDiv.classList.add("text-[#ac5e5e]");
+            break;
+          case "2":
+            taskDiv.classList.add("text-[#437d4f]");
+            break;
+          case "3":
+            taskDiv.classList.add("text-[#8c8325]"); // the old one was #b3a437 lol
+            break;
+        }
+      }
+
+      function updateTaskTypeClass(taskTypeInput) {
+        taskTypeInput.classList.remove(
+          "text-red-400",
+          "text-green-300",
+          "text-yellow-400"
+        );
+        switch (taskTypeInput.value) {
+          case "1":
+            taskTypeInput.classList.add("text-red-400");
+            break;
+          case "2":
+            taskTypeInput.classList.add("text-green-300");
+            break;
+          case "3":
+            taskTypeInput.classList.add("text-yellow-400");
+            break;
+        }
+      }
+
+      // Load tasks on page load
+      document.addEventListener("DOMContentLoaded", loadTasksFromLocalStorage);
+
+      // Update saveTaskToLocalStorage function to track notes per day
+      function saveTaskToLocalStorage(id, name, type, date) {
+        tasks.push({ id, name, type, date });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+
+        // Update note count for the day
+        const dateKey = new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+        });
+        let dailyNotes = JSON.parse(localStorage.getItem("dailyNotes")) || {};
+        dailyNotes[dateKey] = (dailyNotes[dateKey] || 0) + 1;
+        localStorage.setItem("dailyNotes", JSON.stringify(dailyNotes));
+      }
+
+      // Update removeTaskFromLocalStorage to decrement notes
+      function removeTaskFromLocalStorage(id) {
+        const taskToRemove = tasks.find((task) => task.id === id);
+        if (taskToRemove) {
+          const dateKey = new Date(taskToRemove.date).toLocaleDateString(
+            "en-US",
+            { weekday: "long" }
+          );
+          let dailyNotes = JSON.parse(localStorage.getItem("dailyNotes")) || {};
+          dailyNotes[dateKey] = Math.max(0, (dailyNotes[dateKey] || 1) - 1);
+          localStorage.setItem("dailyNotes", JSON.stringify(dailyNotes));
+        }
+
+        tasks = tasks.filter((task) => task.id !== id);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
+    </script>
+  </body>
 </html>
