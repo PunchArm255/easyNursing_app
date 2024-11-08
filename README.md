@@ -9,7 +9,7 @@ The idea behind **EasyNursing** is to create a platform that assists healthcare 
 
 ## 🛠️ Technologies Used
 
-- ⚛️ **React** – for building dynamic, reusable components
+- ⚛️ **React (Not at the moment lol)** – for building dynamic, reusable components
 - 🎨 **Tailwind CSS** – for modern, responsive design
 
 ## ✨ Features
