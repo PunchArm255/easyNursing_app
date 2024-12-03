@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com" />
+    <style>
+      @font-face {
+        font-family: "RedHatDisplay";
+        src: url("./fonts/RedHatDisplay-Black.ttf") format("truetype");
+        font-weight: bold;
+        font-style: normal;
+      }
+
+      body {
+        font-family: "RedHatDisplay", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+      }
+
+      :root {
+        --bg-color: #f7f7f7;
+        --text-color: #5e67ac;
+        --sidebar-bg: #5e67ac;
+        --card-bg: #5e67ac;
+        --card-text: #ffffff;
+        --btn-color: #cbd1ff;
+      }
+
+      .sidebar {
+        background-color: var(--sidebar-bg);
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        color: var(--card-text);
+        box-shadow: 0 0 10px 1px var(--card-bg);
+      }
+
+      .sidebar-plus-btn {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .sidebar-plus-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px 2px var(--sidebar-bg);
+      }
+
+      .sidebar-plus-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="flex justify-start items-start h-[150vh] overflow-hidden">
+    <!-- Sidebar -->
+    <div
+      class="sidebar w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]"
+      style="box-shadow: 0 0 40px 1px var(--sidebar-bg)"
+    >
+      <img
+        src="assets/plus.svg"
+        alt="Add Icon"
+        class="w-[40px] mx-auto mb-auto sidebar-plus-btn"
+      />
+      <div class="flex flex-col gap-[30px] pb-[20px]">
+        <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto" />
+        <img
+          src="assets/settings.svg"
+          alt="Settings Icon"
+          class="w-[40px] mx-auto"
+        />
+      </div>
+    </div>
+
+    <!-- Theme Menu -->
+    <div
+      id="themeMenu"
+      class="hidden flex-col space-y-2 p-4 bg-white rounded-lg shadow-lg absolute top-[80px] left-[50px]"
+    >
+      <button class="theme-option" data-theme="default">Default</button>
+      <button class="theme-option" data-theme="dark">Dark Mode</button>
+      <button class="theme-option" data-theme="pastel">Pastel</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-[120px] p-[40px] w-[calc(100%-120px)]">
+      <div class="flex justify-between items-center">
+        <h1 class="text-[64px] var(--sidebar-bg); font-">Bienvenue, User !</h1>
+        <img
+          src="assets/logo.png"
+          alt="easyNursing Logo"
+          class="w-[280px] mr-10 mt-2"
+        />
+      </div>
+
+      <!-- Cards Container -->
+      <div class="flex justify-center gap-[40px] mt-[60px]">
+        <!-- First Card -->
+        <a href="progress.html">
+          <div
+            class="card mt-11 rounded-[70px] w-[300px] h-[400px] flex flex-col justify-start items-center text-center pt-[30px] relative transition-transform transform hover:scale-[1.05] hover:shadow-lg active:scale-[0.98]"
+            style="box-shadow: 0 0 10px 1px var(--sidebar-bg)"
+          >
+            <p class="text-[43px] absolute top-[28px]">Progrès</p>
+            <img
+              src="assets/performance.svg"
+              alt="Performance Icon"
+              class="w-[200px] h-[200px] filter invert mt-20"
+            />
+          </div>
+        </a>
+
+        <!-- Second Card (Big Card) -->
+        <a href="journal.html">
+          <div
+            class="card rounded-[70px] w-[360px] h-[500px] flex flex-col justify-start items-center text-center pt-[30px] relative transition-transform transform hover:scale-[1.05] hover:shadow-lg active:scale-[0.98]"
+            style="box-shadow: 0 0 10px 1px var(--sidebar-bg)"
+          >
+            <p class="text-[50px] absolute top-[30px]">Journal</p>
+            <img
+              src="assets/journal.svg"
+              alt="Journal Icon"
+              class="w-[220px] h-[220px] filter invert mt-28"
+            />
+          </div>
+        </a>
+
+        <!-- Third Card -->
+        <a href="verification.html">
+          <div
+            class="card mt-11 rounded-[70px] w-[300px] h-[400px] flex flex-col justify-start items-center text-center pt-[30px] relative transition-transform transform hover:scale-[1.05] hover:shadow-lg active:scale-[0.98]"
+            style="box-shadow: 0 0 10px 1px var(--sidebar-bg)"
+          >
+            <p class="text-[43px] absolute top-[28px]">A Vérifier</p>
+            <img
+              src="assets/verify.svg"
+              alt="A Vérifier Icon"
+              class="w-[200px] h-[200px] filter invert mt-20"
+            />
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // Themes Definition
+      const themes = {
+        default: {
+          "--bg-color": "#f7f7f7",
+          "--text-color": "#5e67ac",
+          "--sidebar-bg": "#5e67ac",
+          "--card-bg": "#5e67ac",
+          "--card-text": "#ffffff",
+        },
+        dark: {
+          "--bg-color": "#333",
+          "--text-color": "#f1f1f1",
+          "--sidebar-bg": "#444",
+          "--card-bg": "#444",
+          "--card-text": "#fff",
+        },
+        pastel: {
+          "--bg-color": "#fffbf0",
+          "--text-color": "#7d7a7a",
+          "--sidebar-bg": "#ffe1e1",
+          "--card-bg": "#ffe1e1",
+          "--card-text": "#b96b6b",
+        },
+      };
+
+      // Function to Apply Theme
+      function applyTheme(themeName) {
+        const theme = themes[themeName];
+        for (const key in theme) {
+          document.documentElement.style.setProperty(key, theme[key]);
+        }
+        localStorage.setItem("selectedTheme", themeName); // Persist theme
+      }
+
+      // Event Listener for Theme Menu
+      document.getElementById("themeMenu").addEventListener("click", (e) => {
+        if (e.target.classList.contains("theme-option")) {
+          const selectedTheme = e.target.getAttribute("data-theme");
+          applyTheme(selectedTheme);
+        }
+      });
+
+      // Show/Hide Theme Menu on Plus Button Click
+      document
+        .querySelector(".sidebar-plus-btn")
+        .addEventListener("click", () => {
+          const themeMenu = document.getElementById("themeMenu");
+          themeMenu.classList.toggle("hidden");
+        });
+
+      // Apply Theme on Load
+      const savedTheme = localStorage.getItem("selectedTheme") || "default";
+      applyTheme(savedTheme);
+    </script>
+  </body>
+</html>

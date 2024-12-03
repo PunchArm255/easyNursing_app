@@ -1,356 +1,422 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reminders</title>
-  <link rel="stylesheet" href="https://cdn.tailwindcss.com">
-  <style>
-    @font-face {
-      font-family: 'RedHatDisplay';
-      src: url('./fonts/RedHatDisplay-Black.ttf') format('truetype');
-      font-weight: bold;
-      font-style: normal;
-    }
-
-    body {
-      font-family: 'RedHatDisplay', sans-serif;
-    }
-
-    .scale-0 {
-      transform: scale(0);
-    }
-    .scale-100 {
-      transform: scale(1);
-    }
-    .modal-enter {
-      opacity: 0;
-    }
-    .modal-active {
-      opacity: 1;
-      backdrop-filter: blur(8px);
-      transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
-    }
-    .modal-content-active {
-      transition: transform 0.3s ease;
-    }
-    .modal-exit {
-      opacity: 0;
-      transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
-    }
-  </style>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-[#f7f7f7] flex justify-start items-start h-screen">
-
-<!-- Sidebar -->
-<div class="bg-[#5e67ac] w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]"
-   style="box-shadow: 0 0 40px 1px #5e67ac;">
-  <img src="assets/plus.svg" alt="Add Icon" class="w-[40px] mx-auto mb-auto">
-  <div class="flex flex-col gap-[30px] pb-[20px]">
-    <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto">
-    <img src="assets/settings.svg" alt="Settings Icon" class="w-[40px] mx-auto">
-  </div>
-</div>
-
-<!-- Main Content -->
-<div class="flex-1 ml-[100px] px-10 py-8">
-
-  <!-- Journal Title -->
-  <h1 class="text-5xl font-bold text-[#5e67ac] mb-4">
-    A Vérifier
-  </h1>
-
-  <!-- Buttons -->
-  <div class="w-full flex justify-between mb-8">
-    <button id="addReminderBtn" class="bg-[#cbd1ff] text-[#5e67ac] rounded-full py-2 px-6">
-      Ajouter un reminder
-    </button>
-    <button class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-5 mr-11"
-        onclick="window.location.href='index.html'">
-      Retour a l'accueil
-    </button>
-  </div>
-
-  <!-- Reminder and Countdown Boxes -->
-  <div class="flex space-x-4">
-    <!-- Reminder Box -->
-    <div class="w-[700px] h-[500px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto" id="reminderContainer"
-    style="box-shadow: 0 0 50px 0.1px #cbd1ff;">
-      <!-- Dynamically added tasks will go here -->
-    </div>
-
-    <!-- Countdown Box -->
-    <div class="w-[500px] h-[500px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto" id="countdownContainer"
-    style="box-shadow: 0 0 50px 0.1px #cbd1ff;">
-      <!-- Dynamically added countdowns will go here -->
-    </div>
-  </div>
-  
-</div>
-
-<!-- Modal (hidden by default) -->
-<div id="reminderModal" class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active">
-  <div class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active">
-  <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">Ajouter un reminder</h2>
-  <input type="text" id="reminderName" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4" placeholder="Nom du reminder">
-  <div class="mb-4">
-    <label class="mr-4 text-[#5e67ac] text-xl ml-1">Categorie:</label>
-    <select id="reminderType" class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400">
-      <option value="1" class="text-red-400">Examens Paracliniques</option>
-      <option value="2" class="text-green-300">Traitement Recu</option>
-      <option value="3" class="text-yellow-300">Soins Prodigue</option>
-    </select>
-  </div>
-  <div class="mb-4">
-    <label class="text-[#5e67ac] text-xl ml-1">Countdown (minutes):</label>
-    <input type="number" id="reminderCountdown" class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2" placeholder="Enter countdown in minutes">
-  </div>
-    <div class="flex space-x-2 justify-end">
-    <button id="saveReminderBtn" class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-4">
-      Enregistrer
-    </button>
-    <button id="deleteReminderBtn" class="bg-[#d55e5e] text-[#ffe1e1] rounded-full py-2 px-4 hidden">
-      Supprimer
-    </button>
-    <button id="cancelReminderBtn" class="bg-[#f1f3ff] text-[#5e67ac] rounded-full py-2 px-4">
-      Annuler
-    </button>
-    </div>
-  </div>
-</div>
-
-<script>
-  let editingReminder = null; // Reference to the task being edited
-  let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-
-  const addReminderBtn = document.getElementById('addReminderBtn');
-  const reminderModal = document.getElementById('reminderModal');
-  const cancelReminderBtn = document.getElementById('cancelReminderBtn');
-  const saveReminderBtn = document.getElementById('saveReminderBtn');
-  const reminderNameInput = document.getElementById('reminderName');
-  const reminderTypeInput = document.getElementById('reminderType');
-  const reminderCountdownInput = document.getElementById('reminderCountdown');
-  const reminderContainer = document.getElementById('reminderContainer');
-  const countdownContainer = document.getElementById('countdownContainer');
-  const modalContent = reminderModal.querySelector('div');
-  const deleteReminderBtn = document.getElementById('deleteReminderBtn');
-  const modalTitle = document.getElementById('modalTitle');
-
-  let countdowns = [];
-
-  addReminderBtn.addEventListener('click', () => {
-    resetModal();
-    reminderModal.classList.remove('hidden', 'modal-enter');
-    reminderModal.classList.add('modal-active');
-    setTimeout(() => {
-      modalContent.classList.remove('scale-0');
-      modalContent.classList.add('scale-100');
-    }, 10);
-  });
-
-  cancelReminderBtn.addEventListener('click', closeModal);
-
-  saveReminderBtn.addEventListener('click', () => {
-    const reminderName = reminderNameInput.value.trim();
-    const reminderType = reminderTypeInput.value;
-    const reminderCountdown = parseInt(reminderCountdownInput.value) || 0;
-    const reminderDate = new Date().getTime(); // current time in milliseconds
-
-    if (reminderName !== "" && reminderCountdown > 0) {
-      const expirationTime = reminderDate + reminderCountdown * 60 * 1000;
-
-      if (editingReminder) {
-        editingReminder.name = reminderName;
-        editingReminder.type = reminderType;
-        editingReminder.expirationTime = expirationTime;
-      } else {
-        const reminderId = Date.now().toString();
-        const reminder = {
-          id: reminderId,
-          name: reminderName,
-          type: reminderType,
-          expirationTime
-        };
-        reminders.push(reminder);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reminders</title>
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com" />
+    <style>
+      @font-face {
+        font-family: "RedHatDisplay";
+        src: url("./fonts/RedHatDisplay-Black.ttf") format("truetype");
+        font-weight: bold;
+        font-style: normal;
       }
 
-      saveRemindersToLocalStorage();
-      displayReminders();
-      closeModal();
-    }
-  });
-
-  function closeModal() {
-    reminderModal.classList.add('modal-exit');
-    setTimeout(() => {
-      reminderModal.classList.add('hidden', 'modal-enter');
-      reminderModal.classList.remove('modal-active', 'modal-exit');
-      modalContent.classList.add('scale-0');
-      modalContent.classList.remove('scale-100');
-    }, 300);
-  }
-
-  function resetModal() {
-    reminderNameInput.value = "";
-    reminderTypeInput.value = "1";
-    reminderCountdownInput.value = "";
-    deleteReminderBtn.classList.add('hidden');
-    saveReminderBtn.innerText = 'Enregistrer';
-    modalTitle.innerText = 'Ajouter un reminder';
-  }
-
-  function saveRemindersToLocalStorage() {
-    localStorage.setItem('reminders', JSON.stringify(reminders));
-  }
-
-  function displayReminders() {
-    reminderContainer.innerHTML = ''; // Clear the existing reminders
-    countdownContainer.innerHTML = ''; // Clear the existing countdowns
-
-    reminders.forEach((reminder, index) => {
-      const reminderBox = document.createElement('div');
-      reminderBox.classList.add('bg-[#fff]', 'p-4', 'rounded-2xl', 'mb-4', 'relative', 'border-l-[6px]');
-      reminderBox.setAttribute('data-id', reminder.id);
-    
-      if (reminder.type === "1") {
-        reminderBox.classList.add('border-red-400');
-      } else if (reminder.type === "2") {
-        reminderBox.classList.add('border-green-300');
-      } else if (reminder.type === "3") {
-        reminderBox.classList.add('border-yellow-300');
+      body {
+        font-family: "RedHatDisplay", sans-serif;
       }
-    
-      reminderBox.innerHTML = `
+
+      .scale-0 {
+        transform: scale(0);
+      }
+      .scale-100 {
+        transform: scale(1);
+      }
+      .modal-enter {
+        opacity: 0;
+      }
+      .modal-active {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+        transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+      }
+      .modal-content-active {
+        transition: transform 0.3s ease;
+      }
+      .modal-exit {
+        opacity: 0;
+        transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-[#f7f7f7] flex justify-start items-start h-screen">
+    <!-- Sidebar -->
+    <div
+      class="bg-[#5e67ac] w-[80px] h-screen rounded-tr-[40px] rounded-br-[40px] flex flex-col justify-between fixed left-0 top-0 py-[30px]"
+      style="box-shadow: 0 0 40px 1px #5e67ac"
+    >
+      <img
+        src="assets/plus.svg"
+        alt="Add Icon"
+        class="w-[40px] mx-auto mb-auto"
+      />
+      <div class="flex flex-col gap-[30px] pb-[20px]">
+        <img src="assets/user.svg" alt="User Icon" class="w-[40px] mx-auto" />
+        <img
+          src="assets/settings.svg"
+          alt="Settings Icon"
+          class="w-[40px] mx-auto"
+        />
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-[100px] px-10 py-8">
+      <!-- Journal Title -->
+      <h1 class="text-5xl font-bold text-[#5e67ac] mb-4">A Vérifier</h1>
+
+      <!-- Buttons -->
+      <div class="w-full flex justify-between mb-8">
+        <button
+          id="addReminderBtn"
+          class="bg-[#cbd1ff] text-[#5e67ac] rounded-full py-2 px-6"
+        >
+          Ajouter un reminder
+        </button>
+        <button
+          class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-5 mr-11"
+          onclick="window.location.href='home.html'"
+        >
+          Retour a l'accueil
+        </button>
+      </div>
+
+      <!-- Reminder and Countdown Boxes -->
+      <div class="flex space-x-4">
+        <!-- Reminder Box -->
+        <div
+          class="w-[700px] h-[500px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto"
+          id="reminderContainer"
+          style="box-shadow: 0 0 50px 0.1px #cbd1ff"
+        >
+          <!-- Dynamically added tasks will go here -->
+        </div>
+
+        <!-- Countdown Box -->
+        <div
+          class="w-[500px] h-[500px] bg-[#f1f3ff] rounded-3xl p-4 overflow-y-auto"
+          id="countdownContainer"
+          style="box-shadow: 0 0 50px 0.1px #cbd1ff"
+        >
+          <!-- Dynamically added countdowns will go here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal (hidden by default) -->
+    <div
+      id="reminderModal"
+      class="fixed inset-0 bg-[#5e67ac] bg-opacity-30 modal-enter hidden flex justify-center items-center modal-active"
+    >
+      <div
+        class="bg-[#cbd1ff] p-6 rounded-3xl shadow-lg w-[500px] transform transition-transform duration-300 scale-0 modal-content-active"
+      >
+        <h2 id="modalTitle" class="text-2xl font-bold mb-2 ml-1 text-[#5e67ac]">
+          Ajouter un reminder
+        </h2>
+        <input
+          type="text"
+          id="reminderName"
+          class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2 mb-4"
+          placeholder="Nom du reminder"
+        />
+        <div class="mb-4">
+          <label class="mr-4 text-[#5e67ac] text-xl ml-1">Categorie:</label>
+          <select
+            id="reminderType"
+            class="border bg-[#f1f3ff] rounded-lg p-2 text-red-400"
+          >
+            <option value="1" class="text-red-400">
+              Examens Paracliniques
+            </option>
+            <option value="2" class="text-green-300">Traitement Recu</option>
+            <option value="3" class="text-yellow-300">Soins Prodigue</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label class="text-[#5e67ac] text-xl ml-1"
+            >Countdown (minutes):</label
+          >
+          <input
+            type="number"
+            id="reminderCountdown"
+            class="w-full bg-[#f1f3ff] text-[#5e67ac] rounded-lg p-2"
+            placeholder="Enter countdown in minutes"
+          />
+        </div>
+        <div class="flex space-x-2 justify-end">
+          <button
+            id="saveReminderBtn"
+            class="bg-[#5e67ac] text-[#cbd1ff] rounded-full py-2 px-4"
+          >
+            Enregistrer
+          </button>
+          <button
+            id="deleteReminderBtn"
+            class="bg-[#d55e5e] text-[#ffe1e1] rounded-full py-2 px-4 hidden"
+          >
+            Supprimer
+          </button>
+          <button
+            id="cancelReminderBtn"
+            class="bg-[#f1f3ff] text-[#5e67ac] rounded-full py-2 px-4"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let editingReminder = null; // Reference to the task being edited
+      let reminders = JSON.parse(localStorage.getItem("reminders")) || [];
+
+      const addReminderBtn = document.getElementById("addReminderBtn");
+      const reminderModal = document.getElementById("reminderModal");
+      const cancelReminderBtn = document.getElementById("cancelReminderBtn");
+      const saveReminderBtn = document.getElementById("saveReminderBtn");
+      const reminderNameInput = document.getElementById("reminderName");
+      const reminderTypeInput = document.getElementById("reminderType");
+      const reminderCountdownInput =
+        document.getElementById("reminderCountdown");
+      const reminderContainer = document.getElementById("reminderContainer");
+      const countdownContainer = document.getElementById("countdownContainer");
+      const modalContent = reminderModal.querySelector("div");
+      const deleteReminderBtn = document.getElementById("deleteReminderBtn");
+      const modalTitle = document.getElementById("modalTitle");
+
+      let countdowns = [];
+
+      addReminderBtn.addEventListener("click", () => {
+        resetModal();
+        reminderModal.classList.remove("hidden", "modal-enter");
+        reminderModal.classList.add("modal-active");
+        setTimeout(() => {
+          modalContent.classList.remove("scale-0");
+          modalContent.classList.add("scale-100");
+        }, 10);
+      });
+
+      cancelReminderBtn.addEventListener("click", closeModal);
+
+      saveReminderBtn.addEventListener("click", () => {
+        const reminderName = reminderNameInput.value.trim();
+        const reminderType = reminderTypeInput.value;
+        const reminderCountdown = parseInt(reminderCountdownInput.value) || 0;
+        const reminderDate = new Date().getTime(); // current time in milliseconds
+
+        if (reminderName !== "" && reminderCountdown > 0) {
+          const expirationTime = reminderDate + reminderCountdown * 60 * 1000;
+
+          if (editingReminder) {
+            editingReminder.name = reminderName;
+            editingReminder.type = reminderType;
+            editingReminder.expirationTime = expirationTime;
+          } else {
+            const reminderId = Date.now().toString();
+            const reminder = {
+              id: reminderId,
+              name: reminderName,
+              type: reminderType,
+              expirationTime,
+            };
+            reminders.push(reminder);
+          }
+
+          saveRemindersToLocalStorage();
+          displayReminders();
+          closeModal();
+        }
+      });
+
+      function closeModal() {
+        reminderModal.classList.add("modal-exit");
+        setTimeout(() => {
+          reminderModal.classList.add("hidden", "modal-enter");
+          reminderModal.classList.remove("modal-active", "modal-exit");
+          modalContent.classList.add("scale-0");
+          modalContent.classList.remove("scale-100");
+        }, 300);
+      }
+
+      function resetModal() {
+        reminderNameInput.value = "";
+        reminderTypeInput.value = "1";
+        reminderCountdownInput.value = "";
+        deleteReminderBtn.classList.add("hidden");
+        saveReminderBtn.innerText = "Enregistrer";
+        modalTitle.innerText = "Ajouter un reminder";
+      }
+
+      function saveRemindersToLocalStorage() {
+        localStorage.setItem("reminders", JSON.stringify(reminders));
+      }
+
+      function displayReminders() {
+        reminderContainer.innerHTML = ""; // Clear the existing reminders
+        countdownContainer.innerHTML = ""; // Clear the existing countdowns
+
+        reminders.forEach((reminder, index) => {
+          const reminderBox = document.createElement("div");
+          reminderBox.classList.add(
+            "bg-[#fff]",
+            "p-4",
+            "rounded-2xl",
+            "mb-4",
+            "relative",
+            "border-l-[6px]"
+          );
+          reminderBox.setAttribute("data-id", reminder.id);
+
+          if (reminder.type === "1") {
+            reminderBox.classList.add("border-red-400");
+          } else if (reminder.type === "2") {
+            reminderBox.classList.add("border-green-300");
+          } else if (reminder.type === "3") {
+            reminderBox.classList.add("border-yellow-300");
+          }
+
+          reminderBox.innerHTML = `
         <h2 class="text-[#5e67ac] text-xl font-bold">${reminder.name}</h2>
         <button class="absolute top-2 right-2 bg-[#5e67ac] text-[#f1f3ff] rounded-full mt-1 py-1 px-3 markDoneBtn" data-id="${reminder.id}">
           Mark as done
         </button>
       `;
-    
-      reminderBox.addEventListener('click', () => {
-        openEditModal(reminder);
-      });
-    
-      // Add reminder to the reminder container
-      reminderContainer.appendChild(reminderBox);
-    
-      const timeLeft = getTimeRemaining(reminder.expirationTime);
-      const countdownBox = document.createElement('div');
-      countdownBox.classList.add('bg-[#fff]', 'p-4', 'rounded-2xl', 'mb-4', 'shadow-lg');
-      countdownBox.setAttribute('data-id', reminder.id);
-    
-      // Set background and text color based on reminder type
-      if (reminder.type === "1") {
-        countdownBox.classList.add('bg-red-100', 'text-red-500');
-        countdownBox.style.boxShadow = '0 0 10px 0.1px #ffcccc';
-      } else if (reminder.type === "2") {
-        countdownBox.classList.add('bg-green-100', 'text-green-500');
-        countdownBox.style.boxShadow = '0 0 10px 0.1px #ccffcc';
-      } else if (reminder.type === "3") {
-        countdownBox.classList.add('bg-yellow-100', 'text-yellow-500');
-        countdownBox.style.boxShadow = '0 0 10px 0.1px #ffffcc';
-      }
-    
-      if (timeLeft.total <= 0) {
-        reminderBox.classList.add('opacity-50'); // Faded style for expired reminders
-        countdownBox.innerHTML = `
+
+          reminderBox.addEventListener("click", () => {
+            openEditModal(reminder);
+          });
+
+          // Add reminder to the reminder container
+          reminderContainer.appendChild(reminderBox);
+
+          const timeLeft = getTimeRemaining(reminder.expirationTime);
+          const countdownBox = document.createElement("div");
+          countdownBox.classList.add(
+            "bg-[#fff]",
+            "p-4",
+            "rounded-2xl",
+            "mb-4",
+            "shadow-lg"
+          );
+          countdownBox.setAttribute("data-id", reminder.id);
+
+          // Set background and text color based on reminder type
+          if (reminder.type === "1") {
+            countdownBox.classList.add("bg-red-100", "text-red-500");
+            countdownBox.style.boxShadow = "0 0 10px 0.1px #ffcccc";
+          } else if (reminder.type === "2") {
+            countdownBox.classList.add("bg-green-100", "text-green-500");
+            countdownBox.style.boxShadow = "0 0 10px 0.1px #ccffcc";
+          } else if (reminder.type === "3") {
+            countdownBox.classList.add("bg-yellow-100", "text-yellow-500");
+            countdownBox.style.boxShadow = "0 0 10px 0.1px #ffffcc";
+          }
+
+          if (timeLeft.total <= 0) {
+            reminderBox.classList.add("opacity-50"); // Faded style for expired reminders
+            countdownBox.innerHTML = `
           <h2 class="text-[#d55e5e] text-xl font-bold">${reminder.name}</h2>
           <p class="text-[#5e67ac]">Expired</p>
         `;
-      } else {
-        countdownBox.innerHTML = `
+          } else {
+            countdownBox.innerHTML = `
           <h2 class="text-[#5e67ac] text-xl font-bold">${reminder.name}</h2>
           <p class="text-[#5e67ac]">Time Left: ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s</p>
         `;
+          }
+
+          // Add countdown box to the countdown container
+          countdownContainer.appendChild(countdownBox);
+
+          // Add event listener for "Mark as done" button
+          const markDoneBtn = reminderBox.querySelector(".markDoneBtn");
+          markDoneBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            markReminderAsDone(reminder, reminderBox, countdownBox);
+          });
+        });
+
+        updateCountdowns();
       }
-    
-      // Add countdown box to the countdown container
-      countdownContainer.appendChild(countdownBox);
-    
-      // Add event listener for "Mark as done" button
-      const markDoneBtn = reminderBox.querySelector('.markDoneBtn');
-      markDoneBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        markReminderAsDone(reminder, reminderBox, countdownBox);
-      });
-    });
 
-    updateCountdowns();
-  }
+      function markReminderAsDone(reminder, reminderBox, countdownBox) {
+        reminderBox.classList.add("bg-green-300");
+        reminderBox.querySelector("h2").innerText = `${reminder.name} - DONE`;
+        countdownBox.remove();
+        reminder.done = true;
+        saveRemindersToLocalStorage();
+      }
 
-  function markReminderAsDone(reminder, reminderBox, countdownBox) {
-    reminderBox.classList.add('bg-green-300');
-    reminderBox.querySelector('h2').innerText = `${reminder.name} - DONE`;
-    countdownBox.remove();
-    reminder.done = true;
-    saveRemindersToLocalStorage();
-  }
+      function saveRemindersToLocalStorage() {
+        const activeReminders = reminders.filter((reminder) => !reminder.done);
+        localStorage.setItem("reminders", JSON.stringify(activeReminders));
+      }
 
-  function saveRemindersToLocalStorage() {
-    const activeReminders = reminders.filter(reminder => !reminder.done);
-    localStorage.setItem('reminders', JSON.stringify(activeReminders));
-  }
+      function openEditModal(reminder) {
+        editingReminder = reminder;
+        reminderNameInput.value = reminder.name;
+        reminderTypeInput.value = reminder.type;
+        reminderCountdownInput.value = Math.floor(
+          (reminder.expirationTime - new Date().getTime()) / (60 * 1000)
+        );
+        deleteReminderBtn.classList.remove("hidden");
+        saveReminderBtn.innerText = "Modifier";
+        modalTitle.innerText = "Modifier le reminder";
+        reminderModal.classList.remove("hidden", "modal-enter");
+        reminderModal.classList.add("modal-active");
+        setTimeout(() => {
+          modalContent.classList.remove("scale-0");
+          modalContent.classList.add("scale-100");
+        }, 10);
+      }
 
-  function openEditModal(reminder) {
-    editingReminder = reminder;
-    reminderNameInput.value = reminder.name;
-    reminderTypeInput.value = reminder.type;
-    reminderCountdownInput.value = Math.floor((reminder.expirationTime - new Date().getTime()) / (60 * 1000));
-    deleteReminderBtn.classList.remove('hidden');
-    saveReminderBtn.innerText = 'Modifier';
-    modalTitle.innerText = 'Modifier le reminder';
-    reminderModal.classList.remove('hidden', 'modal-enter');
-    reminderModal.classList.add('modal-active');
-    setTimeout(() => {
-      modalContent.classList.remove('scale-0');
-      modalContent.classList.add('scale-100');
-    }, 10);
-  }
+      function updateCountdowns() {
+        countdowns.forEach((countdown) => clearInterval(countdown));
+        countdowns = [];
 
-  function updateCountdowns() {
-    countdowns.forEach((countdown) => clearInterval(countdown));
-    countdowns = [];
+        reminders.forEach((reminder, index) => {
+          const countdown = setInterval(() => {
+            const timeLeft = getTimeRemaining(reminder.expirationTime);
+            const countdownBox = countdownContainer.querySelector(
+              `[data-id="${reminder.id}"]`
+            );
 
-    reminders.forEach((reminder, index) => {
-      const countdown = setInterval(() => {
-        const timeLeft = getTimeRemaining(reminder.expirationTime);
-        const countdownBox = countdownContainer.querySelector(`[data-id="${reminder.id}"]`);
-
-        if (timeLeft.total <= 0) {
-          clearInterval(countdown);
-          reminders.splice(index, 1);
-          saveRemindersToLocalStorage();
-          displayReminders();
-        } else if (countdownBox) {
-          countdownBox.innerHTML = `
+            if (timeLeft.total <= 0) {
+              clearInterval(countdown);
+              reminders.splice(index, 1);
+              saveRemindersToLocalStorage();
+              displayReminders();
+            } else if (countdownBox) {
+              countdownBox.innerHTML = `
             <h2 class="text-[#5e67ac] text-xl font-bold">${reminder.name}</h2>
             <p class="text-[#5e67ac]">Time Left: ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s</p>
           `;
-        }
-      }, 1000);
+            }
+          }, 1000);
 
-      countdowns.push(countdown);
-    });
-  }
+          countdowns.push(countdown);
+        });
+      }
 
-  function getTimeRemaining(expirationTime) {
-    const now = new Date().getTime();
-    const total = expirationTime - now;
-    const seconds = Math.floor((total / 1000) % 60);
-    const minutes = Math.floor((total / 1000 / 60) % 60);
-    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+      function getTimeRemaining(expirationTime) {
+        const now = new Date().getTime();
+        const total = expirationTime - now;
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor((total / 1000 / 60) % 60);
+        const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
 
-    return {
-      total,
-      hours,
-      minutes,
-      seconds
-    };
-  }
+        return {
+          total,
+          hours,
+          minutes,
+          seconds,
+        };
+      }
 
-  document.addEventListener('DOMContentLoaded', displayReminders);
-</script>
-
-</body>
+      document.addEventListener("DOMContentLoaded", displayReminders);
+    </script>
+  </body>
 </html>
